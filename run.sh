@@ -6,5 +6,5 @@ sudo python3 -m pip install flask
 sudo apt-get install nginx -y
 sudo systemctl restart nginx 
 sudo kill -9 `ps aux | grep hello.py | awk '{print $2}'`
-python3 /home/ubuntu/hello.py &
+nohup python hello.py > app.log 2>&1 &
 echo "Done....."
