@@ -22,5 +22,5 @@ echo 'server {
 
 sudo systemctl restart nginx 
 sudo kill -9 `ps aux | grep hello.py | awk '{print $2}'`
-nohup python3 hello.py &
+python3 /home/ubuntu/hello.py &
 echo "Done....."
