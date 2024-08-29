@@ -5,23 +5,23 @@ pipeline {
         PYTHON_ENV = 'venv'
     }
 
-    // stages {
-    //     stage('Build') {
-    //         steps {
-    //             script {
-    //                 sh 'python3 -m venv $PYTHON_ENV'
-    //                 sh './$PYTHON_ENV/bin/pip install -r requirements.txt'
-    //             }
-    //         }
-    //     }
-
-        stage('Test') {
+    stages {
+        stage('Build') {
             steps {
                 script {
-                    sh './$PYTHON_ENV/bin/pytest'
+                    sh 'python3 -m venv $PYTHON_ENV'
+                    sh './$PYTHON_ENV/bin/pip install -r requirements.txt'
                 }
             }
         }
+
+        // stage('Test') {
+        //     steps {
+        //         script {
+        //             sh './$PYTHON_ENV/bin/pytest'
+        //         }
+        //     }
+        // }
 
         stage('Deploy') {
             when {
