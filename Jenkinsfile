@@ -15,13 +15,13 @@ pipeline {
             }
         }
 
-        // stage('Test') {
-        //     steps {
-        //         script {
-        //             sh './$PYTHON_ENV/bin/pytest'
-        //         }
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                script {
+                    sh './$PYTHON_ENV/bin/pytest'
+                }
+            }
+        }
 
         stage('Deploy') {
             when {
