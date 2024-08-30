@@ -72,12 +72,6 @@ nohup python3 app.py > flaskapp.log 2>&1 &
         always {
             script {
                 echo "Build completed with status: ${currentBuild.result}"
-            }
-        }
-    }
-    post {
-        always {
-            cleanWs()
         }
         success {
             mail to: 'ravikishan1996@gmail.com',
