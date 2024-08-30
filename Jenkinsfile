@@ -60,7 +60,7 @@ sudo apt install python3-pip -y
 sudo apt install python3-flask -y
 pip install -r requirements.txt 
 nohup python3 app.py > flaskapp.log 2>&1 &
-EOF
+.
                         """
                     }
                 }
