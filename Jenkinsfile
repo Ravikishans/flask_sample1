@@ -75,4 +75,19 @@ nohup python3 app.py > flaskapp.log 2>&1 &
             }
         }
     }
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            mail to: 'ravikishan1996@gmail.com',
+                subject: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+                body: "The build was successful!"
+        }
+        failure {
+            mail to: 'ravikishan1996@gmail.com',
+                subject: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+                body: "The build failed. Please check Jenkins for more details."
+        }
+    }        
 }
