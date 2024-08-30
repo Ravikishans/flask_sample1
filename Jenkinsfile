@@ -50,17 +50,17 @@ pipeline {
                 script {
                     withCredentials([sshUserPrivateKey(credentialsId: "${env.CREDENTIALS_ID}", keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                         sh """
-                        scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r Jenkinsfile README.md hello.py index.html requirements.txt run.sh tests ubuntu@${STAGING_SERVER}:/home/ubuntu
-                        ssh -i ${SSH_KEY} ubuntu@${STAGING_SERVER} 'python3 -m venv myvenv && source myvenv/bin/activate && pip install -r requirements.txt'
-
-cd .
-. myvenv/bin/activate
-sudo apt update -y
-sudo apt install python3-pip -y
-sudo apt install python3-flask -y
-pip install -r requirements.txt 
-nohup python3 app.py > flaskapp.log 2>&1 &
-.
+                        scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r Jenkinsfile README.md hello.py index.html requirements.txt run.sh tests ubuntu@${STAGING_SERVER}:${DEPLOY_DIR}
+                        ssh -i ${SSH_KEY} ubuntu@${STAGING_SERVER} '
+                        cd ${DEPLOY_DIR}
+                        python3 -m venv myvenv
+                        source myvenv/bin/activate
+                        pip install -r requirements.txt
+                        sudo apt update -y
+                        sudo apt install python3-pip -y
+                        sudo apt install python3-flask -y
+                        nohup python3 app.py > flaskapp.log 2>&1 &
+                        '
                         """
                     }
                 }
@@ -70,8 +70,8 @@ nohup python3 app.py > flaskapp.log 2>&1 &
 
     post {
         always {
-            script {
-                echo "Build completed with status: ${currentBuild.result}"
+            cleanWs()
+            echo "Build completed with status: ${currentBuild.result}"
         }
         success {
             mail to: 'ravikishan1996@gmail.com',
@@ -83,5 +83,5 @@ nohup python3 app.py > flaskapp.log 2>&1 &
                 subject: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
                 body: "The build failed. Please check Jenkins for more details."
         }
-    }        
+    }
 }
