@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DEPLOY_DIR = "/home/ubuntu/FlaskAPP"
-        GIT_REPO = "https://github.com/Piyush-2395/FlaskAPP.git"
+        DEPLOY_DIR = "/home/ubuntu/flask_sample1"
+        GIT_REPO = "https://github.com/Ravikishans/flask_sample1.git"
         STAGING_SERVER = "3.36.11.64"
         CREDENTIALS_ID = "flaskapp" // Ensure this matches the ID in Jenkins
     }
@@ -28,8 +28,8 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
+                    python3 -m venv myvenv
+                    . myyvenv/bin/activate
                     pip install -r requirements.txt
                     '''
                 }
@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    . venv/bin/activate
+                    . myvenv/bin/activate
                     pytest
                     '''
                 }
@@ -53,7 +53,7 @@ pipeline {
                         scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r * ${SSH_USER}@${env.STAGING_SERVER}:${env.DEPLOY_DIR}
                         ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${env.STAGING_SERVER} <<EOF
 cd ${DEPLOY_DIR}
-. venv/bin/activate
+. myvenv/bin/activate
 sudo apt update -y
 sudo apt install python3-pip -y
 sudo apt install python3-flask -y
