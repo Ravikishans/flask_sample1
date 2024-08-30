@@ -53,7 +53,7 @@ pipeline {
                         scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r Jenkinsfile README.md hello.py index.html requirements.txt run.sh tests ubuntu@3.38.171.226:/home/ubuntu
                         ssh -i ${SSH_KEY} ubuntu@3.38.171.226 'python3 -m venv myvenv && source myvenv/bin/activate && pip install -r requirements.txt'
 
-cd ${DEPLOY_DIR}
+cd .
 . myvenv/bin/activate
 sudo apt update -y
 sudo apt install python3-pip -y
