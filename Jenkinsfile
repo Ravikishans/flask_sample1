@@ -4,7 +4,7 @@ pipeline {
     environment {
         DEPLOY_DIR = "/home/ubuntu/flask_sample1"
         GIT_REPO = "https://github.com/Ravikishans/flask_sample1.git"
-        STAGING_SERVER = "43.202.157.15"
+        STAGING_SERVER = "3.38.171.226"
         CREDENTIALS_ID = "flaskapp" // Ensure this matches the ID in Jenkins
     }
 
