@@ -2,37 +2,66 @@ pipeline {
     agent any
 
     environment {
-        PYTHON_ENV = 'venv'
+        DEPLOY_DIR = "/home/ubuntu/FlaskAPP"
+        GIT_REPO = "https://github.com/Piyush-2395/FlaskAPP.git"
+        STAGING_SERVER = "3.36.11.64"
+        CREDENTIALS_ID = "flaskapp" // Ensure this matches the ID in Jenkins
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: "${env.GIT_REPO}"
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh '''
+                    sudo apt-get update
+                    sudo apt-get install -y python3-venv
+                    '''
+                }
+            }
+        }
         stage('Build') {
             steps {
                 script {
-                    sh 'python3 -m venv $PYTHON_ENV'
-                    sh './$PYTHON_ENV/bin/pip install -r requirements.txt'
+                    sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    '''
                 }
             }
         }
-
         stage('Test') {
             steps {
                 script {
-                    sh './$PYTHON_ENV/bin/pytest'
+                    sh '''
+                    . venv/bin/activate
+                    pytest
+                    '''
                 }
             }
         }
-
         stage('Deploy') {
-            when {
-                expression {
-                    return currentBuild.result == null || currentBuild.result == 'SUCCESS'
-                }
-            }
             steps {
                 script {
-                    echo 'Deploying to staging environment...'
-                    // Add your deployment commands here, e.g., scp to server, etc.
+                    withCredentials([sshUserPrivateKey(credentialsId: "${env.CREDENTIALS_ID}", keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                        sh """
+                        scp -o StrictHostKeyChecking=no -i ${SSH_KEY} -r * ${SSH_USER}@${env.STAGING_SERVER}:${env.DEPLOY_DIR}
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${env.STAGING_SERVER} <<EOF
+cd ${DEPLOY_DIR}
+. venv/bin/activate
+sudo apt update -y
+sudo apt install python3-pip -y
+sudo apt install python3-flask -y
+pip install -r requirements.txt 
+nohup python3 app.py > flaskapp.log 2>&1 &
+EOF
+                        """
+                    }
                 }
             }
         }
@@ -40,17 +69,9 @@ pipeline {
 
     post {
         always {
-            cleanWs()
-        }
-        success {
-            mail to: 'ravikishan1996@gmail.com',
-                 subject: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                 body: "The build was successful!"
-        }
-        failure {
-            mail to: 'ravikishan1996@gmail.com',
-                 subject: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-                 body: "The build failed. Please check Jenkins for more details."
+            script {
+                echo "Build completed with status: ${currentBuild.result}"
+            }
         }
     }
 }
