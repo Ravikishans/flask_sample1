@@ -238,10 +238,12 @@ def test_home(client):
 ### Configuring the Pipeline Job
 
 1. **Go to Jenkins Dashboard → New Item** and create a new pipeline job.
+2. **Select Pipeline script from SCM** and select SCM as Git 
+3. **Configure it**
 
-2. **Pipeline Definition:**
+### Create a Jenkinsfile
 
-Add the following pipeline script in the `Pipeline` section:
+In the root directory of your project, create a `Jenkinsfile` with the following content:
 
 ```groovy
 pipeline {
